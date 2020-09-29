@@ -1,61 +1,170 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
 
-## About Laravel
+## Laravel API Versioning
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p>Versioning is the practice of creating collaborative data sharing and editing controls to ensure that your product continues to give consumers more choices without having to upgrade to the latest version</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p>I’m going to show the simple way to make API versions in Laravel</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+- **Clone the reop**
+- **Setup local environmet**
+- **Run migrations**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+###1. Creating custom route files
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+We have two  API versions in the repo, go to `routes` folder, create two files:
+- **api_v1.php**
+- **api_v2.php**
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+###2. Mapping custom API route files
+Go to `RouteServiceProvider` two coustom routes added under `boot` method
+```
+Route::prefix('api/v1')
+    ->middleware('api')
+    ->namespace('App\Http\Controllers')
+    ->group(base_path('routes/api_v1.php'));
 
-### Premium Partners
+Route::prefix('api/v2')
+    ->middleware('api')
+    ->namespace('App\Http\Controllers')
+    ->group(base_path('routes/api_v2.php'));
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+```
+We have two api versions, so we added two route method, there may be more version of the APIs, so we can add more routes here.
 
-## Contributing
+Explaination:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+`prefix('api/v1')` prefixing app version
 
-## Code of Conduct
+`middleware('api')` default middlware for APIs
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+`namespace('App\Http\Controllers')` Poining the controller`s path to the routes files
 
-## Security Vulnerabilities
+`group(base_path('routes/api_v1.php'));` custom created route files that will server the contents to the `api/v1`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+###3. Controllers
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Go to `app/Http/Controllers` there are two folders names `V1 and V2` and `UsersController.php` files in these folders and `index` method in both controllers.
+
+In `app\Http\Controllers\V1\WelcomeController.php`
+```
+
+class UsersController extends Controller
+{
+    public function index()
+    {
+        $response = [
+            'success' => true,
+            'message' => "Welcome to API version 1",
+        ];
+
+        return response()->json($response, 200);
+    }
+}
+``` 
+
+In `app\Http\Controllers\V2\WelcomeController.php`
+```
+
+class UsersController extends Controller
+{
+    public function index()
+    {
+        $response = [
+            'success' => true,
+            'message' => "Welcome to API version 2",
+        ];
+
+        return response()->json($response, 200);
+    }
+}
+``` 
+
+so here we are separating the controller folders to maintain the API versions.
+means that If you have more API versions, you can create new route file with the name api_v3.php, map it to the `RouteServiceProvider`, create a separate folder under `Controllers` with name `V3`
+
+###4. Custom routes
+Go to `routes\api_v1.php`
+```
+Route::get('welcome', 'V1\UsersController@index');
+```
+
+Go to `routes\api_v2.php`
+```
+Route::get('welcome', 'V2\UsersController@index');
+```
+
+Both routes pointed to `UsersController`'s index method but with different Versions of prefixing.
+
+###5. Default API to check active/inactive versions of the APIs
+
+We have created a default API without prfixing the versions like `v1 or v2` to check all the availablke and active/inactive versions of the APIs, so in the front-end you can call this API on the splash screen to
+check that the current version of the front-end app, is availbe and active. 
+
+To check that API, Go the the `routes/api.php`
+```
+Route::get('version', 'APIVersioningController@index');
+```
+It is directly pointing the `app\Http\Controllers\APIVersioningController` outside the versions.
+
+Go to the file
+
+```
+namespace App\Http\Controllers;
+
+use App\Models\APIVersion;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+
+class APIVersioningController extends BaseController
+{
+    private $api_version;
+    public function __construct(APIVersion $api_version)
+    {
+        $this->api_version = $api_version;
+    }
+
+    public function index()
+    {
+        return $this->api_version->get();
+    }
+}
+```
+Here we are injecting `APIVersion` model to the constructer method and returning all the available versions of the APIs in `index` method.
+
+For `APIVersion` model class, Go to `app\Models\APIVersion` 
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class APIVersion extends Model
+{
+    protected $table = 'api_versions';
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function get()
+    {
+        return response()->json(APIVersion::all(), 200);
+    }
+}
+```
+
+
+Here is the structure of the migrated table `api_versions` that holds app versions, api version corrosponding to the particular app verison and the status of the particular version.
+
+
+| app_version  | api_version | Status |
+| ------------ |:-----------:| -----:|
+| 1            | v1          | false |
+| 1.1          | v1          | true |
+| 2            | v2          | true |
