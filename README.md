@@ -13,7 +13,7 @@
 
 ### 1. Creating custom route files
 
-We have two  API versions in the repo, go to `routes` folder, create two files:
+We have two  API versions in the repo, go to `routes` folder.:
 - **api_v1.php**
 - **api_v2.php**
 
