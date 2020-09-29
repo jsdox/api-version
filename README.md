@@ -8,7 +8,7 @@
 
 
 - **Clone the reop**
-- **Setup local environmet**
+- **Setup local enviroment**
 - **Run migrations**
 
 ### 1. Creating custom route files
