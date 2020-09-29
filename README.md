@@ -18,7 +18,7 @@ We have two  API versions in the repo, go to `routes` folder, create two files:
 - **api_v2.php**
 
 
-###2. Mapping custom API route files
+### 2. Mapping custom API route files
 Go to `RouteServiceProvider` two coustom routes added under `boot` method
 ```
 Route::prefix('api/v1')
