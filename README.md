@@ -11,7 +11,7 @@
 - **Setup local environmet**
 - **Run migrations**
 
-###1. Creating custom route files
+### 1. Creating custom route files
 
 We have two  API versions in the repo, go to `routes` folder, create two files:
 - **api_v1.php**
@@ -45,7 +45,7 @@ Explaination:
 `group(base_path('routes/api_v1.php'));` custom created route files that will server the contents to the `api/v1`
 
 
-###3. Controllers
+### 3. Controllers
 
 Go to `app/Http/Controllers` there are two folders names `V1 and V2` and `UsersController.php` files in these folders and `index` method in both controllers.
 
@@ -86,7 +86,7 @@ class UsersController extends Controller
 so here we are separating the controller folders to maintain the API versions.
 means that If you have more API versions, you can create new route file with the name api_v3.php, map it to the `RouteServiceProvider`, create a separate folder under `Controllers` with name `V3`
 
-###4. Custom routes
+### 4. Custom routes
 Go to `routes\api_v1.php`
 ```
 Route::get('welcome', 'V1\UsersController@index');
@@ -99,7 +99,7 @@ Route::get('welcome', 'V2\UsersController@index');
 
 Both routes pointed to `UsersController`'s index method but with different Versions of prefixing.
 
-###5. Default API to check active/inactive versions of the APIs
+### 5. Default API to check active/inactive versions of the APIs
 
 We have created a default API without prfixing the versions like `v1 or v2` to check all the availablke and active/inactive versions of the APIs, so in the front-end you can call this API on the splash screen to
 check that the current version of the front-end app, is availbe and active. 
